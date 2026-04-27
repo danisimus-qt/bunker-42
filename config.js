@@ -16,7 +16,7 @@ const CONFIG = {
   // Инструкция по получению ключа и ID плейлиста — в README.md
   youtube: {
     apiKey:     "ВСТАВЬ_СВОЙ_КЛЮЧ_ЗДЕСЬ",
-    playlistId: "ВСТАВЬ_ID_ПЛЕЙЛИСТА_ЗДЕСЬ",
+    playlistId: "PLl6gXhZpKwP5iV1QmSt7EZs-4sS8-r3ks",
   },
 
 
