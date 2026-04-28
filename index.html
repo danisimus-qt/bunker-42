@@ -6,101 +6,135 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>БУНКЕР 42</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
 :root{
-  --g:#4cff91;--g40:rgba(76,255,145,0.4);--g15:rgba(76,255,145,0.15);
-  --g08:rgba(76,255,145,0.08);
-  --glow:0 0 10px rgba(76,255,145,0.55),0 0 28px rgba(76,255,145,0.2);
-  --glow-sm:0 0 6px rgba(76,255,145,0.4);
-  --bg:#060806;--card:rgba(3,7,3,0.92);
-  --mono:'Share Tech Mono',monospace;--title:'Orbitron',sans-serif;
+  --a:#FF8C00;--a-hi:#FFA733;
+  --a40:rgba(255,140,0,0.4);--a15:rgba(255,140,0,0.15);--a08:rgba(255,140,0,0.08);
+  --glow:0 0 10px rgba(255,140,0,0.6),0 0 28px rgba(255,140,0,0.18);
+  --glow-sm:0 0 5px rgba(255,140,0,0.5);
+  --bg:#060402;
+  --mono:'Share Tech Mono',monospace;
+  --title:'Orbitron',sans-serif;
 }
-body{background:var(--bg);color:var(--g);font-family:var(--mono);-webkit-font-smoothing:antialiased}
-#scanlines{position:fixed;inset:0;z-index:998;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent 0px,transparent 3px,rgba(0,0,0,0.09) 3px,rgba(0,0,0,0.09) 4px)}
+body{background:var(--bg);color:var(--a);font-family:var(--mono);-webkit-font-smoothing:antialiased}
+
 #bg-layer{position:fixed;inset:0;z-index:0}
-.bg-slide{position:absolute;inset:0;background-size:100% 100%;background-position:center;
-  opacity:0;transition:opacity 2.5s ease}
+.bg-slide{position:absolute;inset:0;background-size:100% 100%;background-position:center;opacity:0;transition:opacity 2.5s ease}
 .bg-slide.active{opacity:1}
-@keyframes bg-zoom{from{transform:scale(1.0)}to{transform:scale(1.07)}}
-#bg-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,
-  rgba(6,8,6,0.72) 0%,rgba(6,8,6,0.38) 45%,rgba(6,8,6,0.82) 100%)}
-#bg-tint{position:absolute;inset:0;background:rgba(8,22,12,0.28)}
+#bg-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,4,2,0.45) 0%,rgba(6,4,2,0.1) 40%,rgba(6,4,2,0.55) 100%)}
+#bg-tint{position:absolute;inset:0;background:rgba(15,8,2,0.15)}
+
 #app{position:relative;z-index:10;height:100vh;display:flex;flex-direction:column}
-header{flex-shrink:0;padding:22px 30px;display:flex;align-items:flex-start;justify-content:space-between}
-#clock{font-family:var(--mono);line-height:1.5}
-#clock-time{font-size:24px;color:var(--g);text-shadow:var(--glow);letter-spacing:3px}
-#clock-date{font-size:11px;letter-spacing:3px;color:rgba(76,255,145,0.42)}
+
+header{flex-shrink:0;padding:20px 28px;display:flex;align-items:flex-start;justify-content:space-between}
+
+#clock{font-family:var(--mono);line-height:1.3}
+#clock-time{font-size:66px;color:var(--a);text-shadow:var(--glow);letter-spacing:2px;line-height:1}
+#clock-date{font-size:33px;letter-spacing:3px;color:rgba(255,140,0,0.6);margin-top:4px}
+
 #station-id{text-align:right}
-#station-name{font-family:var(--title);font-size:15px;font-weight:700;letter-spacing:5px;color:var(--g);text-shadow:var(--glow)}
-#station-freq{font-size:11px;letter-spacing:3px;color:rgba(76,255,145,0.38);margin-top:4px}
-main{flex:1;display:flex;align-items:center;justify-content:center;padding:16px 20px}
-.card{width:min(318px,92vw);background:var(--card);border:1px solid var(--g40);border-radius:2px;
-  padding:18px 18px 22px;
-  box-shadow:0 0 80px rgba(0,0,0,0.95),inset 0 0 60px rgba(76,255,145,0.025),0 0 0 1px rgba(76,255,145,0.07);
-  position:relative}
-.card::before,.card::after{content:'';position:absolute;width:14px;height:14px;
-  border-color:var(--g);border-style:solid;opacity:0.55}
-.card::before{top:-1px;left:-1px;border-width:2px 0 0 2px}
-.card::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
-.card-status{display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:3px;
-  color:rgba(76,255,145,0.38);margin-bottom:14px;text-transform:uppercase}
-.s-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;transition:all 0.4s}
-.s-dot.off{background:rgba(76,255,145,0.2);box-shadow:none}
-.s-dot.on{background:var(--g);box-shadow:0 0 8px var(--g),0 0 16px rgba(76,255,145,0.4);
-  animation:dot-pulse 2.2s ease-in-out infinite}
-@keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:0.35}}
-#cover-wrap{position:relative;width:100%;padding-bottom:100%;background:#080e08;
-  border:1px solid rgba(76,255,145,0.12);overflow:hidden;margin-bottom:15px}
-#cover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  opacity:0;transition:opacity 0.9s ease;filter:brightness(0.88) saturate(0.8)}
+#station-name{font-family:var(--title);font-size:39px;font-weight:700;letter-spacing:5px;color:var(--a);text-shadow:var(--glow)}
+#station-freq{font-size:33px;letter-spacing:3px;color:rgba(255,140,0,0.5);margin-top:6px}
+
+main{flex:1;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;position:relative}
+
+#desk-scene{width:100%;height:100%;display:flex;align-items:flex-end;justify-content:center;position:relative}
+#desk{position:absolute;bottom:0;left:0;right:0;height:34%;background:linear-gradient(to bottom,rgba(44,28,15,0.7) 0%,rgba(19,10,4,0.8) 100%)}
+#desk::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,rgba(255,140,0,0.06),transparent)}
+
+#objects{position:absolute;bottom:32%;left:50%;transform:translateX(-50%);display:flex;align-items:flex-end;gap:36px}
+
+/* MONITOR */
+#monitor{display:flex;flex-direction:column;align-items:center}
+.mon-body{width:268px;height:238px;background:#cdc9b4;border-radius:10px 10px 4px 4px;padding:14px;position:relative;box-shadow:inset 0 2px 0 rgba(255,255,255,0.4),inset -4px 0 0 #b5b09a}
+.mon-body::before{content:'';position:absolute;top:0;left:0;right:0;height:8px;background:#d8d4be;border-radius:10px 10px 0 0}
+.mon-top-vents{display:flex;gap:4px;position:absolute;top:10px;left:18px}
+.mon-top-vents span{width:18px;height:2px;background:#b8b4a0;border-radius:1px;display:block}
+.mon-bezel{width:100%;height:190px;background:#141412;border-radius:4px;padding:5px;position:relative}
+.mon-screen{width:100%;height:100%;background:#060301;border-radius:2px;overflow:hidden;position:relative}
+.mon-screen::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:rgba(255,140,0,0.02)}
+.mon-screen::after{content:'';position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,0.65) 100%)}
+#cover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;opacity:0;transition:opacity 0.9s ease;filter:brightness(0.85) saturate(0.65);z-index:1}
 #cover-img.loaded{opacity:1}
-#cover-wrap::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(76,255,145,0.045) 3px,rgba(76,255,145,0.045) 4px)}
-#cover-wrap::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:rgba(10,40,20,0.18)}
-#cover-placeholder{position:absolute;inset:0;z-index:0;display:flex;align-items:center;
-  justify-content:center;font-family:var(--title);font-size:10px;letter-spacing:4px;color:rgba(76,255,145,0.08)}
-#track-title{font-family:var(--mono);font-size:13px;letter-spacing:1px;color:var(--g);
-  text-shadow:var(--glow-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  height:20px;transition:opacity 0.35s}
-#track-artist{font-family:var(--mono);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;
-  color:rgba(76,255,145,0.38);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  margin-top:6px;height:15px;transition:opacity 0.35s}
-.controls{display:flex;justify-content:center;margin-top:22px}
-#play-btn{width:60px;height:60px;border-radius:50%;border:1px solid var(--g40);
-  background:var(--g08);color:var(--g);cursor:pointer;display:flex;align-items:center;
-  justify-content:center;transition:all 0.2s ease;box-shadow:0 0 18px rgba(76,255,145,0.1);
-  -webkit-tap-highlight-color:transparent}
-#play-btn:hover{background:rgba(76,255,145,0.13);border-color:var(--g);
-  box-shadow:0 0 30px rgba(76,255,145,0.28),inset 0 0 20px rgba(76,255,145,0.06);transform:scale(1.05)}
-#play-btn:active{transform:scale(0.94)}
-#vol-wrap{display:flex;align-items:center;gap:10px;margin-top:20px}
-.vol-label{font-size:10px;letter-spacing:2px;color:rgba(76,255,145,0.28);width:32px;text-align:right}
-#vol-slider{flex:1;-webkit-appearance:none;height:2px;background:rgba(76,255,145,0.18);
-  border-radius:1px;outline:none;cursor:pointer}
-#vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;
-  background:var(--g);box-shadow:0 0 8px rgba(76,255,145,0.7);cursor:pointer;transition:transform 0.15s}
-#vol-slider::-webkit-slider-thumb:hover{transform:scale(1.35)}
-#vol-slider::-moz-range-thumb{width:13px;height:13px;border-radius:50%;border:none;
-  background:var(--g);box-shadow:0 0 8px rgba(76,255,145,0.7);cursor:pointer}
-#vol-val{font-size:10px;color:rgba(76,255,145,0.28);letter-spacing:1px;width:28px}
-footer{flex-shrink:0;padding:0 30px 22px;display:flex;justify-content:space-between;align-items:flex-end}
-.footer-text{font-size:10px;letter-spacing:2px;color:rgba(76,255,145,0.15);text-transform:uppercase}
-@media(max-width:480px){
-  header{padding:16px 18px}footer{padding:0 18px 16px}
-  #clock-time{font-size:19px}#station-name{font-size:12px;letter-spacing:4px}
-  .card{padding:14px 14px 18px}#vol-wrap{display:none}
+#cover-placeholder{position:absolute;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;font-family:var(--title);font-size:9px;letter-spacing:5px;color:rgba(255,140,0,0.08)}
+#screen-status{position:absolute;bottom:0;left:0;right:0;z-index:6;padding:3px 6px;background:rgba(6,3,1,0.85);display:flex;align-items:center;gap:6px}
+.s-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;transition:all 0.4s}
+.s-dot.off{background:rgba(255,140,0,0.2)}
+.s-dot.on{background:var(--a);box-shadow:0 0 6px var(--a);animation:dot-p 2s ease-in-out infinite}
+@keyframes dot-p{0%,100%{opacity:1}50%{opacity:0.3}}
+#status-text{font-size:8px;letter-spacing:2.5px;color:rgba(255,140,0,0.45);text-transform:uppercase}
+#track-overlay{position:absolute;top:6px;left:0;right:0;z-index:6;text-align:center;padding:0 6px}
+#track-title{font-size:11px;letter-spacing:0.5px;color:rgba(255,140,0,0.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity 0.35s;height:16px}
+#track-artist{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,140,0,0.4);margin-top:2px;transition:opacity 0.35s}
+
+.mon-bottom{width:100%;padding:6px 14px;display:flex;justify-content:space-between;align-items:center}
+.mon-knobs{display:flex;gap:6px}
+.mon-knob{width:8px;height:8px;border-radius:50%;background:#b0aa96;box-shadow:inset 0 1px rgba(0,0,0,0.3)}
+.mon-brand{font-size:7px;letter-spacing:1.5px;color:#8a8470;font-family:var(--mono)}
+.mon-neck{width:72px;height:20px;background:#bebaaa}
+.mon-foot{width:148px;height:14px;background:#b5b19c;border-radius:4px}
+
+/* CONTROLS */
+#controls-wrap{position:absolute;bottom:calc(34% - 58px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:18px;z-index:20}
+#play-btn{width:52px;height:52px;border-radius:50%;border:1px solid var(--a40);background:rgba(255,140,0,0.07);color:var(--a);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;-webkit-tap-highlight-color:transparent;flex-shrink:0}
+#play-btn:hover{background:rgba(255,140,0,0.14);border-color:var(--a);transform:scale(1.06)}
+#play-btn:active{transform:scale(0.93)}
+#vol-wrap{display:flex;align-items:center;gap:8px}
+.vol-lbl{font-size:9px;letter-spacing:2px;color:rgba(255,140,0,0.28);width:28px;text-align:right}
+#vol-slider{flex:1;width:80px;-webkit-appearance:none;height:2px;background:rgba(255,140,0,0.16);border-radius:1px;outline:none;cursor:pointer}
+#vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--a);cursor:pointer}
+#vol-slider::-moz-range-thumb{width:12px;height:12px;border-radius:50%;border:none;background:var(--a);cursor:pointer}
+#vol-val{font-size:9px;color:rgba(255,140,0,0.25);letter-spacing:1px;width:24px}
+
+/* ELEKTRONIKA CLOCK */
+#clock-device{display:flex;flex-direction:column;align-items:center;margin-bottom:2px}
+.clk-body{width:176px;height:78px;background:#3d2010;border-radius:8px;position:relative;box-shadow:inset 0 2px 0 rgba(255,255,255,0.08),inset -3px 0 0 rgba(0,0,0,0.3)}
+.clk-display{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:148px;height:54px;background:#040608;border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+#vfd-time{font-family:var(--mono);font-size:28px;color:#00e5cc;letter-spacing:4px;text-shadow:0 0 8px rgba(0,229,204,0.6)}
+#vfd-date{font-family:var(--mono);font-size:9px;color:rgba(0,229,204,0.45);letter-spacing:1.5px}
+.clk-brand{font-family:var(--mono);font-size:8px;font-style:italic;color:#5a3520;letter-spacing:2px;margin-top:3px;text-align:center}
+.clk-base{width:150px;height:10px;background:#2d1508;border-radius:0 0 5px 5px}
+
+/* COLA */
+#cola-wrap{position:absolute;bottom:calc(34% - 6px);left:calc(50% - 210px);z-index:15}
+.cola{width:24px;height:52px;background:#c02828;border-radius:3px 3px 2px 2px;position:relative}
+.cola::before{content:'';position:absolute;top:0;left:2px;right:2px;height:6px;background:#d03030;border-radius:2px}
+.cola::after{content:'';position:absolute;top:8px;left:0;right:0;height:2px;background:rgba(255,255,255,0.12)}
+
+/* FOOTER */
+footer{flex-shrink:0;padding:0 28px 20px;display:flex;justify-content:space-between;align-items:flex-end}
+.footer-text{font-size:9px;letter-spacing:1.5px;color:rgba(255,140,0,0.15);text-transform:uppercase}
+
+/* QR CODE */
+#qr-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+#qr-wrap canvas{border:1px solid rgba(255,140,0,0.2)}
+#qr-label{font-size:8px;letter-spacing:2px;color:rgba(255,140,0,0.2);text-transform:uppercase}
+
+/* MOBILE */
+@media(max-width:640px){
+  #desk-scene,#desk,#cola-wrap{display:none}
+  main{align-items:center;padding:16px}
+  #objects{position:static;transform:none;flex-direction:column;align-items:center;gap:16px}
+  .mon-body{width:min(268px,88vw)}
+  #controls-wrap{position:static;transform:none}
+  #clock-device{display:none}
+  footer{padding:0 18px 16px}
+  #clock-time{font-size:36px}
+  #clock-date{font-size:18px}
+  #station-name{font-size:20px}
+  #station-freq{font-size:16px}
+  #qr-wrap{display:none}
 }
+
 #yt-container{position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;overflow:hidden;pointer-events:none}
 </style>
 </head>
 <body>
-<div id="scanlines"></div>
 <div id="bg-layer"><div id="bg-overlay"></div><div id="bg-tint"></div></div>
+
 <div id="app">
   <header>
     <div id="clock">
@@ -108,41 +142,78 @@ footer{flex-shrink:0;padding:0 30px 22px;display:flex;justify-content:space-betw
       <div id="clock-date">00.00.0000</div>
     </div>
     <div id="station-id">
-      <div id="station-name">БУНКЕР 42</div>
-      <div id="station-freq">42.0 FM</div>
+      <div id="station-name">РАДИО БУНКЕР 42</div>
+      <div id="station-freq">105.3 FM</div>
     </div>
   </header>
+
   <main>
-    <div class="card">
-      <div class="card-status">
-        <div class="s-dot off" id="s-dot"></div>
-        <span id="status-text">ИНИЦИАЛИЗАЦИЯ</span>
+    <div id="desk-scene">
+      <div id="desk"></div>
+      <div id="objects">
+        <div id="monitor">
+          <div class="mon-body">
+            <div class="mon-top-vents"><span></span><span></span><span></span></div>
+            <div class="mon-bezel">
+              <div class="mon-screen">
+                <div id="cover-placeholder">BUNKER 42</div>
+                <img id="cover-img" src="" alt="">
+                <div id="track-overlay">
+                  <div id="track-title">—</div>
+                  <div id="track-artist">загрузка</div>
+                </div>
+                <div id="screen-status">
+                  <div class="s-dot off" id="s-dot"></div>
+                  <span id="status-text">ИНИЦИАЛИЗАЦИЯ</span>
+                </div>
+              </div>
+            </div>
+            <div class="mon-bottom">
+              <div class="mon-knobs"><div class="mon-knob"></div><div class="mon-knob"></div></div>
+              <div class="mon-brand">APPLE IIe</div>
+            </div>
+          </div>
+          <div class="mon-neck"></div>
+          <div class="mon-foot"></div>
+        </div>
+        <div id="clock-device">
+          <div class="clk-body">
+            <div class="clk-display">
+              <div id="vfd-time">00:00</div>
+              <div id="vfd-date">00.00.0000</div>
+            </div>
+          </div>
+          <div class="clk-brand">Электроника</div>
+          <div class="clk-base"></div>
+        </div>
       </div>
-      <div id="cover-wrap">
-        <div id="cover-placeholder">BUNKER 42</div>
-        <img id="cover-img" src="" alt="">
-      </div>
-      <div id="track-title">—</div>
-      <div id="track-artist">загрузка</div>
-      <div class="controls">
+      <div id="cola-wrap"><div class="cola"></div></div>
+      <div id="controls-wrap">
         <button id="play-btn" aria-label="Play / Pause">
-          <svg id="icon-play" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-          <svg id="icon-pause" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          <svg id="icon-play" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="icon-pause" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         </button>
-      </div>
-      <div id="vol-wrap">
-        <span class="vol-label">VOL</span>
-        <input type="range" id="vol-slider" min="0" max="100" value="70">
-        <span id="vol-val">70</span>
+        <div id="vol-wrap">
+          <span class="vol-lbl">VOL</span>
+          <input type="range" id="vol-slider" min="0" max="100" value="70" step="1">
+          <span id="vol-val">70</span>
+        </div>
       </div>
     </div>
   </main>
+
   <footer>
-    <span class="footer-text" id="footer-l">МОСКВА / 2097</span>
-    <span class="footer-text">ТРАНСЛЯЦИЯ ПРОДОЛЖАЕТСЯ</span>
+    <span class="footer-text" id="footer-l">В эфире с 2077, когда упали бомбы.</span>
+    <div id="qr-wrap">
+      <canvas id="qr-canvas"></canvas>
+      <span id="qr-label">Telegram</span>
+    </div>
   </footer>
 </div>
+
 <div id="yt-container"><div id="yt-iframe"></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="config.js"></script>
 <script>
 const RADIO_EPOCH=1700000000;
@@ -156,7 +227,8 @@ function updateClock(){
   const dd=String(msk.getDate()).padStart(2,'0'),mo=String(msk.getMonth()+1).padStart(2,'0'),yr=msk.getFullYear()+71;
   document.getElementById('clock-time').textContent=`${hh}:${mm}:${ss}`;
   document.getElementById('clock-date').textContent=`${dd}.${mo}.${yr}`;
-  document.getElementById('footer-l').textContent=`МОСКВА / ${yr}`;
+  document.getElementById('vfd-time').textContent=`${hh}:${mm}`;
+  document.getElementById('vfd-date').textContent=`${dd}.${mo}.${yr}`;
 }
 setInterval(updateClock,1000);updateClock();
 
@@ -166,6 +238,18 @@ document.title=CONFIG.station.name;
 document.getElementById('vol-slider').value=CONFIG.player.defaultVolume;
 document.getElementById('vol-val').textContent=CONFIG.player.defaultVolume;
 currentVol=CONFIG.player.defaultVolume;
+
+function initQR(){
+  try{
+    new QRCode(document.getElementById('qr-canvas'),{
+      text:'https://t.me/twoslicesofpizzza',
+      width:64,height:64,
+      colorDark:'rgba(255,140,0,0.5)',
+      colorLight:'rgba(0,0,0,0)',
+      correctLevel:QRCode.CorrectLevel.L
+    });
+  }catch(e){}
+}
 
 function initBackgrounds(){
   const layer=document.getElementById('bg-layer'),overlay=document.getElementById('bg-overlay');
@@ -182,19 +266,13 @@ function initBackgrounds(){
   },CONFIG.backgrounds.interval*1000);
 }
 
-function seededRand(seed){
-  let s=seed>>>0;
-  return()=>{s=Math.imul(1664525,s)+1013904223>>>0;return s/4294967296};
-}
+function seededRand(seed){let s=seed>>>0;return()=>{s=Math.imul(1664525,s)+1013904223>>>0;return s/4294967296};}
 function deterministicShuffle(arr){
   const a=[...arr],rnd=seededRand(42);
   for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   return a;
 }
-function buildQueue(){
-  const idx=allTracks.map((_,i)=>i);
-  queue=CONFIG.player.shuffle?deterministicShuffle(idx):idx;
-}
+function buildQueue(){queue=CONFIG.player.shuffle?deterministicShuffle(allTracks.map((_,i)=>i)):allTracks.map((_,i)=>i);}
 
 function parseDuration(iso){
   if(!iso)return 240;
@@ -204,27 +282,27 @@ function parseDuration(iso){
 }
 
 async function fetchDurations(videoIds){
-  const{apiKey}=CONFIG.youtube,durations={};
+  const{apiKey}=CONFIG.youtube,d={};
   for(let i=0;i<videoIds.length;i+=50){
     const batch=videoIds.slice(i,i+50).join(',');
     try{
       const res=await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${batch}&key=${apiKey}`);
       const data=await res.json();
-      (data.items||[]).forEach(item=>{durations[item.id]=parseDuration(item.contentDetails?.duration);});
+      (data.items||[]).forEach(item=>{d[item.id]=parseDuration(item.contentDetails?.duration);});
     }catch(e){}
   }
-  return durations;
+  return d;
 }
 
 function getCurrentPosition(){
   const now=Math.floor(Date.now()/1000),elapsed=now-RADIO_EPOCH;
   const totalDur=allTracks.reduce((s,t)=>s+t.duration,0);
   if(!totalDur)return{trackIdx:0,seekTo:0};
-  const posInCycle=elapsed%totalDur;
+  const pos=elapsed%totalDur;
   let acc=0;
   for(let i=0;i<queue.length;i++){
     const dur=allTracks[queue[i]].duration;
-    if(posInCycle<acc+dur)return{trackIdx:i,seekTo:posInCycle-acc};
+    if(pos<acc+dur)return{trackIdx:i,seekTo:pos-acc};
     acc+=dur;
   }
   return{trackIdx:0,seekTo:0};
@@ -232,15 +310,14 @@ function getCurrentPosition(){
 
 async function fetchPlaylist(pageToken){
   const{apiKey,playlistId}=CONFIG.youtube;
-  if(!apiKey||apiKey.includes('ВСТАВЬ')){setStatus('УКАЖИ API КЛЮЧ В CONFIG.JS');return[];}
-  if(!playlistId||playlistId.includes('ВСТАВЬ')){setStatus('УКАЖИ ID ПЛЕЙЛИСТА В CONFIG.JS');return[];}
+  if(!apiKey||apiKey.includes('ВСТАВЬ')){setStatus('УКАЖИ API КЛЮЧ');return[];}
+  if(!playlistId||playlistId.includes('ВСТАВЬ')){setStatus('УКАЖИ ID ПЛЕЙЛИСТА');return[];}
   let url=`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=${apiKey}`;
   if(pageToken)url+=`&pageToken=${pageToken}`;
   let data;
   try{const res=await fetch(url);data=await res.json();}catch(e){setStatus('ОШИБКА СЕТИ');return[];}
-  if(data.error){setStatus(data.error.message.toUpperCase().slice(0,40));return[];}
-  const items=(data.items||[])
-    .filter(it=>it.snippet.title!=='Private video'&&it.snippet.title!=='Deleted video')
+  if(data.error){setStatus(data.error.message.slice(0,40).toUpperCase());return[];}
+  const items=(data.items||[]).filter(it=>it.snippet.title!=='Private video'&&it.snippet.title!=='Deleted video')
     .map(it=>({
       id:it.snippet.resourceId.videoId,title:it.snippet.title,
       thumb:it.snippet.thumbnails?.maxres?.url||it.snippet.thumbnails?.high?.url
@@ -271,7 +348,7 @@ function playTrack(idx,seek){
   if(!ytPlayer||!allTracks.length)return;
   const track=allTracks[queue[idx]];
   loadTrackUI(track);
-  if(seek&&seek>0)ytPlayer.loadVideoById({videoId:track.id,startSeconds:seek});
+  if(seek&&seek>1)ytPlayer.loadVideoById({videoId:track.id,startSeconds:Math.floor(seek)});
   else ytPlayer.loadVideoById(track.id);
 }
 
@@ -311,13 +388,25 @@ function setPlayIcon(showPlay){
   document.getElementById('icon-play').style.display=showPlay?'block':'none';
   document.getElementById('icon-pause').style.display=showPlay?'none':'block';
 }
+
 function togglePlay(){
   if(!hasStarted){
-    hasStarted=true;isMuted=false;applyVolume();
+    hasStarted=true;isMuted=false;
+    if(allTracks.length){
+      const{trackIdx,seekTo}=getCurrentPosition();
+      const state=ytPlayer?ytPlayer.getPlayerState():-1;
+      if(state!==1&&state!==3){
+        queuePos=trackIdx;
+        loadTrackUI(allTracks[queue[queuePos]]);
+        if(ytPlayer)ytPlayer.loadVideoById({videoId:allTracks[queue[queuePos]].id,startSeconds:Math.floor(seekTo)});
+      }
+    }
+    applyVolume();
     if(ytPlayer)ytPlayer.playVideo();
     setPlayIcon(false);
     document.getElementById('s-dot').className='s-dot on';
-    setStatus('В ЭФИРЕ');return;
+    setStatus('В ЭФИРЕ');
+    return;
   }
   isMuted=!isMuted;applyVolume();setPlayIcon(isMuted);
 }
@@ -340,9 +429,9 @@ function tryInitPlayer(){
 }
 function onYTReady(){
   ytPlayer.setVolume(0);
-  if(initialSeek>0)ytPlayer.seekTo(initialSeek,true);
+  if(initialSeek>1)ytPlayer.seekTo(Math.floor(initialSeek),true);
   ytPlayer.playVideo();
-  setStatus('НАЖМИ PLAY ДЛЯ ЗАПУСКА');
+  setStatus('НАЖМИ PLAY');
 }
 function onYTState(e){
   if(e.data===YT.PlayerState.ENDED&&!isVoice)advanceTrack();
@@ -360,8 +449,10 @@ document.addEventListener('keydown',e=>{
 });
 
 async function boot(){
-  initBackgrounds();loadYouTubeAPI();
-  setStatus('ЗАГРУЗКА ПЛЕЙЛИСТА...');
+  initBackgrounds();
+  initQR();
+  loadYouTubeAPI();
+  setStatus('ЗАГРУЗКА...');
   const items=await fetchPlaylist();
   if(!items.length)return;
   setStatus('СИНХРОНИЗАЦИЯ...');
@@ -371,8 +462,8 @@ async function boot(){
   const{trackIdx,seekTo}=getCurrentPosition();
   queuePos=trackIdx;initialSeek=seekTo;
   if(CONFIG.voices.files.length){
-    trackCount=queuePos%CONFIG.voices.interval;
-    voiceIdx=Math.floor(queuePos/CONFIG.voices.interval)%Math.max(1,CONFIG.voices.files.length);
+    trackCount=queuePos%Math.max(1,CONFIG.voices.interval);
+    voiceIdx=Math.floor(queuePos/Math.max(1,CONFIG.voices.interval))%Math.max(1,CONFIG.voices.files.length);
   }
   loadTrackUI(allTracks[queue[queuePos]]);
   tracksReady=true;tryInitPlayer();
