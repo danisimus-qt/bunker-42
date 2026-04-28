@@ -12,25 +12,19 @@
 html,body{height:100%;overflow:hidden}
 
 /*
-  ╔═══════════════════════════════════════════╗
-  ║  НАСТРОЙКА ПОЗИЦИИ ПЛЕЕРА НА ЭКРАНЕ       ║
-  ║  Если плеер съехал — меняй только эти     ║
-  ║  четыре переменные                        ║
-  ╚═══════════════════════════════════════════╝
+  ╔══════════════════════════════════════════════╗
+  ║  ПОЗИЦИЯ ПЛЕЕРА — меняй если съехал          ║
+  ╚══════════════════════════════════════════════╝
+  Монитор в гифке примерно на этих позициях:
+  left=36%, top=16%, width=29%, height=64%
 */
 :root{
-  --screen-left:   36%;   /* левый край экрана монитора  */
-  --screen-top:    18%;   /* верхний край экрана         */
-  --screen-width:  28%;   /* ширина экрана               */
-  --screen-height: 62%;   /* высота экрана               */
-
-  /* CRT перспектива — небольшой наклон */
-  --crt-tilt: perspective(800px) rotateX(2deg) rotateY(-1deg);
-
-  /* Цвет интерфейса */
+  --screen-left:   36%;
+  --screen-top:    16%;
+  --screen-width:  29%;
+  --screen-height: 64%;
   --a:#FF8C00;
   --a40:rgba(255,140,0,0.4);
-  --a08:rgba(255,140,0,0.08);
   --glow:0 0 12px rgba(255,140,0,0.7),0 0 32px rgba(255,140,0,0.2);
   --mono:'Share Tech Mono',monospace;
   --title:'Orbitron',sans-serif;
@@ -42,39 +36,42 @@ body{background:#060402;color:var(--a);font-family:var(--mono);-webkit-font-smoo
 #bg-layer{position:fixed;inset:0;z-index:0}
 .bg-slide{position:absolute;inset:0;background-size:100% 100%;background-position:center;opacity:0;transition:opacity 2.5s ease}
 .bg-slide.active{opacity:1}
-#bg-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,4,2,0.25) 0%,rgba(6,4,2,0.0) 35%,rgba(6,4,2,0.35) 100%)}
+#bg-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,4,2,0.28) 0%,rgba(6,4,2,0.0) 30%,rgba(6,4,2,0.32) 100%)}
 
-/* ── ОСНОВНОЙ СЛОЙ ── */
 #app{position:fixed;inset:0;z-index:10;pointer-events:none}
 
-/* ── ЧАСЫ СЛЕВА СВЕРХУ ── */
-#clock{position:absolute;top:22px;left:26px;font-family:var(--mono);line-height:1.3;pointer-events:none}
+/* ── ЧАСЫ ── */
+#clock{position:absolute;top:22px;left:26px;font-family:var(--mono);line-height:1.3}
 #clock-time{font-size:62px;color:var(--a);text-shadow:var(--glow);letter-spacing:2px;line-height:1}
 #clock-date{font-size:28px;letter-spacing:3px;color:rgba(255,140,0,0.5);margin-top:4px}
 
-/* ── СТАНЦИЯ СПРАВА СВЕРХУ ── */
-#station-id{position:absolute;top:22px;right:26px;text-align:right;pointer-events:none}
+/* ── СТАНЦИЯ ── */
+#station-id{position:absolute;top:22px;right:26px;text-align:right}
 #station-name{font-family:var(--title);font-size:34px;font-weight:700;letter-spacing:5px;color:var(--a);text-shadow:var(--glow)}
 #station-freq{font-size:26px;letter-spacing:3px;color:rgba(255,140,0,0.45);margin-top:6px}
 
-/* ── ПЛЕЕР НА ЭКРАНЕ МОНИТОРА ── */
-#player-screen{
+/* ══════════════════════════════════════════════
+   ПЛЕЕР — вписан в экран монитора на гифке
+   CRT-эффект: перспектива + scanlines + vignette
+══════════════════════════════════════════════ */
+#player{
   position:absolute;
   left:var(--screen-left);
   top:var(--screen-top);
   width:var(--screen-width);
   height:var(--screen-height);
-  transform:var(--crt-tilt);
+  /* CRT наклон монитора */
+  transform: perspective(900px) rotateY(-3deg) rotateX(1.5deg) scale(0.98);
+  transform-origin: center center;
   pointer-events:all;
   display:flex;
   flex-direction:column;
   overflow:hidden;
 }
 
-/* Обложка — занимает большую часть экрана */
+/* Обложка */
 #cover-wrap{
   flex:1;
-  max-height:55%;
   position:relative;
   overflow:hidden;
   min-height:0;
@@ -84,90 +81,95 @@ body{background:#060402;color:var(--a);font-family:var(--mono);-webkit-font-smoo
   width:100%;height:100%;
   object-fit:cover;
   opacity:0;
-  transition:opacity 0.9s ease;
-  filter:brightness(0.82) saturate(0.7) contrast(1.05);
+  transition:opacity 0.8s ease;
+  filter:brightness(0.78) saturate(0.65) contrast(1.1);
 }
 #cover-img.loaded{opacity:1}
 #cover-placeholder{
   position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--title);font-size:10px;letter-spacing:4px;
+  font-family:var(--title);font-size:9px;letter-spacing:4px;
   color:rgba(255,140,0,0.06);
+  background:#060301;
 }
-/* CRT scanlines на обложке */
+/* scanlines */
 #cover-wrap::after{
   content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,0,0,0.14) 2px,rgba(0,0,0,0.14) 3px);
+  background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,0,0,0.18) 2px,rgba(0,0,0,0.18) 3px);
 }
 /* CRT vignette */
 #cover-wrap::before{
   content:'';position:absolute;inset:0;z-index:3;pointer-events:none;
-  background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.55) 100%);
+  background:radial-gradient(ellipse at 50% 50%,transparent 40%,rgba(0,0,0,0.72) 100%);
 }
 
-/* Нижняя панель плеера */
+/* Нижняя панель */
 #player-bar{
-  background:rgba(4,3,1,0.88);
-  padding:6px 10px 8px;
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-  border-top:1px solid rgba(255,140,0,0.12);
+  background:rgba(3,2,1,0.92);
+  padding:7px 10px 9px;
   flex-shrink:0;
+  border-top:1px solid rgba(255,140,0,0.15);
+  display:grid;
+  grid-template-rows:auto auto;
+  gap:6px;
 }
-#track-info-row{display:flex;align-items:center;gap:6px}
+
+/* Строка статус + название */
+#info-row{display:flex;align-items:center;gap:6px;overflow:hidden}
 .s-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;transition:all 0.4s}
-.s-dot.off{background:rgba(255,140,0,0.2)}
-.s-dot.on{background:var(--a);box-shadow:0 0 5px var(--a);animation:dot-p 2s ease-in-out infinite}
-@keyframes dot-p{0%,100%{opacity:1}50%{opacity:0.25}}
-#status-text{font-size:8px;letter-spacing:2px;color:rgba(255,140,0,0.35);text-transform:uppercase}
-#track-title{font-size:11px;letter-spacing:0.5px;color:rgba(255,140,0,0.88);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity 0.35s}
-#controls-row{display:flex;align-items:center;gap:10px}
+.s-dot.off{background:rgba(255,140,0,0.18)}
+.s-dot.on{background:var(--a);box-shadow:0 0 5px var(--a);animation:dp 2s ease-in-out infinite}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:0.2}}
+#status-text{font-size:8px;letter-spacing:2px;color:rgba(255,140,0,0.3);text-transform:uppercase;flex-shrink:0}
+#track-title{font-size:11px;color:rgba(255,140,0,0.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity 0.35s;margin-left:4px}
+
+/* Строка управления */
+#ctrl-row{display:flex;align-items:center;gap:10px}
 #play-btn{
-  width:46px;height:46px;border-radius:50%;flex-shrink:0;
-  border:1px solid rgba(255,140,0,0.35);background:rgba(255,140,0,0.08);color:var(--a);
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:all 0.18s ease;
+  width:44px;height:44px;border-radius:50%;flex-shrink:0;
+  border:1px solid rgba(255,140,0,0.4);
+  background:rgba(255,140,0,0.1);
+  color:var(--a);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.18s;
   -webkit-tap-highlight-color:transparent;
 }
-#play-btn:hover{background:rgba(255,140,0,0.18);border-color:var(--a);transform:scale(1.08)}
+#play-btn:hover{background:rgba(255,140,0,0.22);border-color:var(--a);transform:scale(1.08)}
 #play-btn:active{transform:scale(0.92)}
-#vol-wrap{display:flex;align-items:center;gap:6px;flex:1}
-.vol-lbl{font-size:8px;letter-spacing:1px;color:rgba(255,140,0,0.25);width:22px;text-align:right}
-#vol-slider{width:60px;flex:none;-webkit-appearance:none;height:1px;background:rgba(255,140,0,0.18);border-radius:1px;outline:none;cursor:pointer}
+#vol-wrap{display:flex;align-items:center;gap:6px}
+.vol-lbl{font-size:8px;letter-spacing:1px;color:rgba(255,140,0,0.22);flex-shrink:0}
+#vol-slider{width:58px;flex:none;-webkit-appearance:none;height:1px;background:rgba(255,140,0,0.2);border-radius:1px;outline:none;cursor:pointer}
 #vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:var(--a);cursor:pointer}
 #vol-slider::-moz-range-thumb{width:10px;height:10px;border-radius:50%;border:none;background:var(--a);cursor:pointer}
-#vol-val{font-size:8px;color:rgba(255,140,0,0.22);width:20px}
+#vol-val{font-size:8px;color:rgba(255,140,0,0.2);width:18px}
 
 /* ── ТЕКСТ СНИЗУ СЛЕВА ── */
 #footer-l{
   position:absolute;bottom:18px;left:26px;
-  font-size:15px;letter-spacing:2px;
-  color:rgba(255,140,0,0.7);
+  font-size:14px;letter-spacing:2px;
+  color:rgba(255,140,0,0.65);
   text-transform:uppercase;
-  pointer-events:none;
   font-style:italic;
 }
 
-/* ── QR СПРАВА СНИЗУ ── */
-#qr-wrap{position:absolute;bottom:10px;right:20px;display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none}
-#qr-label{font-size:9px;letter-spacing:2px;color:rgba(255,140,0,0.4);text-transform:uppercase}
+/* ── QR — поверх водяного знака Kling ── */
+#qr-img{
+  position:absolute;
+  bottom:6px;
+  right:6px;
+  width:90px;height:90px;
+  /* Красим синий QR в оранжевый */
+  filter: invert(1) sepia(1) saturate(4) hue-rotate(355deg) brightness(0.9) opacity(0.85);
+  pointer-events:none;
+}
 
-/* ── МОБИЛЬНЫЙ (плеер по центру экрана) ── */
+/* ── МОБИЛЬНЫЙ ── */
 @media(max-width:768px){
-  #player-screen{
-    left:10%;top:auto;
-    bottom:80px;
-    width:80%;
-    height:auto;
-    transform:none;
-  }
-  #cover-wrap{height:200px;flex:none}
-  #clock-time{font-size:36px}
-  #clock-date{font-size:18px}
-  #station-name{font-size:20px}
-  #station-freq{font-size:14px}
-  #qr-wrap,#footer-l{display:none}
+  #player{left:8%;top:auto;bottom:70px;width:84%;height:auto;transform:none}
+  #cover-wrap{height:180px;flex:none}
+  #clock-time{font-size:36px}#clock-date{font-size:18px}
+  #station-name{font-size:20px}#station-freq{font-size:14px}
+  #qr-img,#footer-l{display:none}
 }
 
 #yt-container{position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;overflow:hidden;pointer-events:none}
@@ -178,7 +180,6 @@ body{background:#060402;color:var(--a);font-family:var(--mono);-webkit-font-smoo
 <div id="bg-layer"><div id="bg-overlay"></div></div>
 
 <div id="app">
-
   <div id="clock">
     <div id="clock-time">00:00:00</div>
     <div id="clock-date">00.00.0000</div>
@@ -189,22 +190,21 @@ body{background:#060402;color:var(--a);font-family:var(--mono);-webkit-font-smoo
     <div id="station-freq">105.3 FM</div>
   </div>
 
-  <!-- ПЛЕЕР ПРЯМО НА ЭКРАНЕ МОНИТОРА -->
-  <div id="player-screen">
+  <div id="player">
     <div id="cover-wrap">
       <div id="cover-placeholder">BUNKER 42</div>
       <img id="cover-img" src="" alt="">
     </div>
     <div id="player-bar">
-      <div id="track-info-row">
+      <div id="info-row">
         <div class="s-dot off" id="s-dot"></div>
         <span id="status-text">ИНИЦИАЛИЗАЦИЯ</span>
+        <span id="track-title">—</span>
       </div>
-      <div id="track-title">—</div>
-      <div id="controls-row">
-        <button id="play-btn" aria-label="Play / Pause">
-          <svg id="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-          <svg id="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      <div id="ctrl-row">
+        <button id="play-btn" aria-label="Play/Pause">
+          <svg id="icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         </button>
         <div id="vol-wrap">
           <span class="vol-lbl">VOL</span>
@@ -217,16 +217,12 @@ body{background:#060402;color:var(--a);font-family:var(--mono);-webkit-font-smoo
 
   <div id="footer-l">Лучшая музыка для уцелевших</div>
 
-  <div id="qr-wrap">
-    <div id="qr-canvas"></div>
-    <span id="qr-label">Telegram</span>
-  </div>
-
+  <!-- QR поверх водяного знака Kling -->
+  <img id="qr-img" src="qr.png" alt="Telegram">
 </div>
 
 <div id="yt-container"><div id="yt-iframe"></div></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="config.js"></script>
 <script>
 const RADIO_EPOCH=1700000000;
@@ -249,18 +245,6 @@ document.title=CONFIG.station.name;
 document.getElementById('vol-slider').value=CONFIG.player.defaultVolume;
 document.getElementById('vol-val').textContent=CONFIG.player.defaultVolume;
 currentVol=CONFIG.player.defaultVolume;
-
-function initQR(){
-  try{
-    new QRCode(document.getElementById('qr-canvas'),{
-      text:'https://t.me/twoslicesofpizzza',
-      width:120,height:120,
-      colorDark:'rgba(255,140,0,0.85)',
-      colorLight:'rgba(0,0,0,0)',
-      correctLevel:QRCode.CorrectLevel.L
-    });
-  }catch(e){}
-}
 
 function initBackgrounds(){
   const layer=document.getElementById('bg-layer'),overlay=document.getElementById('bg-overlay');
@@ -342,11 +326,7 @@ async function fetchPlaylist(pageToken){
 function loadTrackUI(track){
   const te=document.getElementById('track-title');
   te.style.opacity=0;
-  setTimeout(()=>{
-    te.textContent=track.title;
-    te.style.transition='opacity 0.5s';
-    te.style.opacity=1;
-  },350);
+  setTimeout(()=>{te.textContent=track.title;te.style.transition='opacity 0.5s';te.style.opacity=1;},350);
   const img=document.getElementById('cover-img');
   img.classList.remove('loaded');
   img.onload=()=>img.classList.add('loaded');
@@ -395,9 +375,9 @@ function applyVolume(){
   if(ytPlayer&&typeof ytPlayer.setVolume==='function')ytPlayer.setVolume(isVoice?0:vol);
   if(voiceAudio)voiceAudio.volume=vol/100;
 }
-function setPlayIcon(showPlay){
-  document.getElementById('icon-play').style.display=showPlay?'block':'none';
-  document.getElementById('icon-pause').style.display=showPlay?'none':'block';
+function setPlayIcon(s){
+  document.getElementById('icon-play').style.display=s?'block':'none';
+  document.getElementById('icon-pause').style.display=s?'none':'block';
 }
 
 function togglePlay(){
@@ -412,12 +392,10 @@ function togglePlay(){
         if(ytPlayer)ytPlayer.loadVideoById({videoId:allTracks[queue[queuePos]].id,startSeconds:Math.floor(seekTo)});
       }
     }
-    applyVolume();
-    if(ytPlayer)ytPlayer.playVideo();
+    applyVolume();if(ytPlayer)ytPlayer.playVideo();
     setPlayIcon(false);
     document.getElementById('s-dot').className='s-dot on';
-    setStatus('В ЭФИРЕ');
-    return;
+    setStatus('В ЭФИРЕ');return;
   }
   isMuted=!isMuted;applyVolume();setPlayIcon(isMuted);
 }
@@ -433,16 +411,14 @@ function tryInitPlayer(){
   const track=allTracks[queue[queuePos]];
   ytPlayer=new YT.Player('yt-iframe',{
     height:'1',width:'1',videoId:track.id,
-    playerVars:{autoplay:0,controls:0,disablekb:1,fs:0,iv_load_policy:3,
-      modestbranding:1,rel:0,start:Math.floor(initialSeek),origin:window.location.origin||'*'},
+    playerVars:{autoplay:0,controls:0,disablekb:1,fs:0,iv_load_policy:3,modestbranding:1,rel:0,start:Math.floor(initialSeek),origin:window.location.origin||'*'},
     events:{onReady:onYTReady,onStateChange:onYTState}
   });
 }
 function onYTReady(){
   ytPlayer.setVolume(0);
   if(initialSeek>1)ytPlayer.seekTo(Math.floor(initialSeek),true);
-  ytPlayer.playVideo();
-  setStatus('НАЖМИ PLAY');
+  ytPlayer.playVideo();setStatus('НАЖМИ PLAY');
 }
 function onYTState(e){
   if(e.data===YT.PlayerState.ENDED&&!isVoice)advanceTrack();
@@ -455,14 +431,10 @@ document.getElementById('vol-slider').addEventListener('input',function(){
   document.getElementById('vol-val').textContent=currentVol;
   if(!isMuted)applyVolume();
 });
-document.addEventListener('keydown',e=>{
-  if(e.code==='Space'&&e.target===document.body){e.preventDefault();togglePlay();}
-});
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target===document.body){e.preventDefault();togglePlay();}});
 
 async function boot(){
-  initBackgrounds();
-  initQR();
-  loadYouTubeAPI();
+  initBackgrounds();loadYouTubeAPI();
   setStatus('ЗАГРУЗКА...');
   const items=await fetchPlaylist();
   if(!items.length)return;
