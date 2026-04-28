@@ -20,10 +20,10 @@ html,body{height:100%;overflow:hidden}
   ╚══════════════════════════════════════════════════════╝
 */
 :root{
-  --sl: 42.7%;
-  --st: 11.9%;
-  --sw: 32.3%;
-  --sh: 55.6%;
+  --sl: 42%;
+  --st: 23%;
+  --sw: 29%;
+  --sh: 44%;
   --a: #FF8C00;
   --a40: rgba(255,140,0,0.4);
   --a10: rgba(255,140,0,0.10);
@@ -156,45 +156,43 @@ body{background:#06040200;color:var(--a);font-family:var(--mono);-webkit-font-sm
   );
 }
 
-/* ── НИЖНЯЯ ПАНЕЛЬ (по скетчу) ──
-   Левая часть: мини-обложка + название + слайдер
-   Правая часть: квадратная кнопка Play
-*/
+/* ── НИЖНЯЯ ПАНЕЛЬ ── */
 #player-bar{
   background:rgba(3,2,1,0.94);
   border-top:1px solid rgba(255,140,0,0.18);
   flex-shrink:0;
   display:flex;
-  align-items:stretch;
-  gap:0;
-  height:72px;
+  align-items:center;
+  padding:0 12px 0 0;
+  height:80px;
 }
-/* Левая часть панели */
+/* Левая часть */
 #bar-left{
   flex:1;
   display:flex;
   flex-direction:column;
+  align-items:center;
   justify-content:center;
-  padding:6px 10px 6px 10px;
-  gap:4px;
+  padding:8px 12px;
+  gap:5px;
   overflow:hidden;
   min-width:0;
 }
 /* Статус */
 #status-row{display:flex;align-items:center;gap:5px}
-.s-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;transition:all 0.4s}
-.s-dot.off{background:rgba(255,140,0,0.15)}
-.s-dot.on{background:var(--a);box-shadow:0 0 5px var(--a);animation:dp 2s ease-in-out infinite}
+.s-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;transition:all 0.4s}
+.s-dot.off{background:rgba(255,140,0,0.2)}
+.s-dot.on{background:var(--a);box-shadow:0 0 6px var(--a);animation:dp 2s ease-in-out infinite}
 @keyframes dp{0%,100%{opacity:1}50%{opacity:0.2}}
-#status-text{font-size:7px;letter-spacing:2px;color:rgba(255,140,0,0.28);text-transform:uppercase}
-/* Название с прокруткой */
-#track-wrap{overflow:hidden;white-space:nowrap}
+#status-text{font-size:10px;letter-spacing:2px;color:rgba(255,140,0,0.65);text-transform:uppercase}
+/* Название по центру с прокруткой */
+#track-wrap{overflow:hidden;white-space:nowrap;width:100%;text-align:center}
 #track-title{
   display:inline-block;
   font-family:var(--mono);
-  font-size:11px;
+  font-size:14px;
   letter-spacing:0.5px;
-  color:rgba(255,140,0,0.9);
+  color:rgba(255,140,0,0.95);
   white-space:nowrap;
   transition:opacity 0.35s;
 }
@@ -205,41 +203,41 @@ body{background:#06040200;color:var(--a);font-family:var(--mono);-webkit-font-sm
   70% {transform:translateX(-50%)}
   100%{transform:translateX(-50%)}
 }
-/* Громкость */
+/* Громкость — компактная */
 #vol-row{display:flex;align-items:center;gap:6px}
-.vol-lbl{font-size:7px;letter-spacing:1px;color:rgba(255,140,0,0.22);flex-shrink:0}
+.vol-lbl{font-size:9px;letter-spacing:1px;color:rgba(255,140,0,0.35);flex-shrink:0}
 #vol-slider{
-  flex:1;-webkit-appearance:none;
+  width:80px;flex:none;
+  -webkit-appearance:none;
   height:2px;background:rgba(255,140,0,0.2);
   border-radius:1px;outline:none;cursor:pointer;
 }
 #vol-slider::-webkit-slider-thumb{
-  -webkit-appearance:none;width:10px;height:10px;border-radius:50%;
+  -webkit-appearance:none;width:11px;height:11px;border-radius:50%;
   background:var(--a);cursor:pointer;
 }
 #vol-slider::-moz-range-thumb{
-  width:10px;height:10px;border-radius:50%;border:none;
+  width:11px;height:11px;border-radius:50%;border:none;
   background:var(--a);cursor:pointer;
 }
-#vol-val{font-size:7px;color:rgba(255,140,0,0.22);width:18px;flex-shrink:0}
+#vol-val{font-size:9px;color:rgba(255,140,0,0.35);width:20px;flex-shrink:0}
 
-/* Правая часть — квадратная кнопка Play */
+/* Кнопка Play — квадратная, с отступом от краёв */
 #play-btn{
-  width:72px;
-  height:72px;
+  width:54px;height:54px;
   flex-shrink:0;
-  border:none;
-  border-left:1px solid rgba(255,140,0,0.18);
-  background:rgba(255,140,0,0.07);
+  border:1px solid rgba(255,140,0,0.4);
+  border-radius:2px;
+  background:rgba(255,140,0,0.08);
   color:var(--a);
   cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:all 0.18s;
   -webkit-tap-highlight-color:transparent;
-  border-radius:0;
+  margin:0 4px;
 }
-#play-btn:hover{background:rgba(255,140,0,0.16);color:rgba(255,140,0,1)}
-#play-btn:active{transform:scale(0.94)}
+#play-btn:hover{background:rgba(255,140,0,0.18);border-color:var(--a)}
+#play-btn:active{transform:scale(0.93)}
 
 /* ── НИЖНИЙ ТЕКСТ ── */
 #footer-l{
