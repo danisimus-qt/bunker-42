@@ -18,10 +18,10 @@ html,body{height:100%;overflow:hidden}
   Немного расширяем:
 */
 :root{
-  --sl: 44%;
-  --st: 17%;
-  --sw: 30%;
-  --sh: 55%;
+  --sl: 38.5%;
+  --st: 29.5%;
+  --sw: 24%;
+  --sh: 31%;
   --a:#FF8C00;
   --a40:rgba(255,140,0,0.4);
   --glow:0 0 14px rgba(255,140,0,0.75),0 0 36px rgba(255,140,0,0.2);
@@ -67,8 +67,8 @@ body{background:#060402;color:var(--a);font-family:var(--mono);-webkit-font-smoo
   pointer-events:all;
   display:flex;flex-direction:column;
   overflow:hidden;
-  transform:perspective(800px) rotateY(-4deg) rotateX(2deg) skewY(-0.5deg);
-  transform-origin:50% 50%;
+  border-radius: 8px 8px 4px 4px;
+  
 }
 
 /* ОБЛОЖКА с рамкой */
@@ -473,56 +473,6 @@ async function boot(){
 boot();
 </script>
 
-<style>
-#cal{
-  position:fixed;bottom:0;left:0;right:0;z-index:9999;
-  background:rgba(0,0,0,0.92);border-top:2px solid #FF8C00;
-  padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
-  font-family:monospace;font-size:12px;color:#FF8C00;
-}
-#cal label{display:flex;align-items:center;gap:6px;white-space:nowrap}
-#cal input[type=range]{width:120px;accent-color:#FF8C00}
-#cal span{min-width:36px;display:inline-block}
-#cal-btn{
-  background:#FF8C00;color:#000;border:none;padding:6px 14px;
-  font-weight:bold;cursor:pointer;font-family:monospace;font-size:12px;
-}
-</style>
-<div id="cal">
-  <label>LEFT <input type="range" id="c-l" min="30" max="70" step="0.5" value="44"><span id="v-l">44%</span></label>
-  <label>TOP <input type="range" id="c-t" min="5" max="50" step="0.5" value="17"><span id="v-t">17%</span></label>
-  <label>WIDTH <input type="range" id="c-w" min="10" max="50" step="0.5" value="30"><span id="v-w">30%</span></label>
-  <label>HEIGHT <input type="range" id="c-h" min="20" max="70" step="0.5" value="55"><span id="v-h">55%</span></label>
-  <button id="cal-btn">СКОПИРОВАТЬ</button>
-  <span id="cal-out"></span>
-</div>
-<script>
-const pl=document.getElementById('player');
-function upd(){
-  const l=document.getElementById('c-l').value;
-  const t=document.getElementById('c-t').value;
-  const w=document.getElementById('c-w').value;
-  const h=document.getElementById('c-h').value;
-  document.getElementById('v-l').textContent=l+'%';
-  document.getElementById('v-t').textContent=t+'%';
-  document.getElementById('v-w').textContent=w+'%';
-  document.getElementById('v-h').textContent=h+'%';
-  pl.style.left=l+'%';
-  pl.style.top=t+'%';
-  pl.style.width=w+'%';
-  pl.style.height=h+'%';
-}
-['c-l','c-t','c-w','c-h'].forEach(id=>document.getElementById(id).addEventListener('input',upd));
-document.getElementById('cal-btn').addEventListener('click',()=>{
-  const l=document.getElementById('c-l').value;
-  const t=document.getElementById('c-t').value;
-  const w=document.getElementById('c-w').value;
-  const h=document.getElementById('c-h').value;
-  const txt=`left=${l}% top=${t}% width=${w}% height=${h}%`;
-  navigator.clipboard.writeText(txt).catch(()=>{});
-  document.getElementById('cal-out').textContent='✓ '+txt;
-});
-</script>
 
 </body>
 </html>
