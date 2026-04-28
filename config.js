@@ -54,10 +54,7 @@ const CONFIG = {
     interval: 12,   // секунд на каждый фон
     sources: [
       // ── Временные фоны (замени на свои) ──
-      "https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?w=1920&q=80",
-      "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1920&q=80",
-      "https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?w=1920&q=80",
-      "https://images.unsplash.com/photo-1536514498073-50e69d39c6cf?w=1920&q=80",
+      "gif.gif"
     ],
   },
 
