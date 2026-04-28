@@ -12,67 +12,115 @@
 html,body{height:100%;overflow:hidden}
 
 /*
-  ╔══════════════════════════════════════════════╗
-  ║  ПОЗИЦИЯ ПЛЕЕРА — меняй если съехал          ║
-  ╚══════════════════════════════════════════════╝
-  Монитор в гифке примерно на этих позициях:
-  left=36%, top=16%, width=29%, height=64%
+  ╔══════════════════════════════════════════════════════╗
+  ║  ПОЗИЦИЯ ПЛЕЕРА                                      ║
+  ║  Вычислено по оригинальной гифке 480×270px           ║
+  ║  Экран монитора: left=42.7%, top=11.9%,              ║
+  ║                  width=32.3%, height=55.6%           ║
+  ╚══════════════════════════════════════════════════════╝
 */
 :root{
-  --screen-left:   36%;
-  --screen-top:    16%;
-  --screen-width:  29%;
-  --screen-height: 64%;
-  --a:#FF8C00;
-  --a40:rgba(255,140,0,0.4);
-  --glow:0 0 12px rgba(255,140,0,0.7),0 0 32px rgba(255,140,0,0.2);
-  --mono:'Share Tech Mono',monospace;
-  --title:'Orbitron',sans-serif;
+  --sl: 42.7%;
+  --st: 11.9%;
+  --sw: 32.3%;
+  --sh: 55.6%;
+  --a: #FF8C00;
+  --a40: rgba(255,140,0,0.4);
+  --a10: rgba(255,140,0,0.10);
+  --glow: 0 0 14px rgba(255,140,0,0.75), 0 0 36px rgba(255,140,0,0.2);
+  --mono: 'Share Tech Mono', monospace;
+  --title: 'Orbitron', sans-serif;
 }
 
-body{background:#060402;color:var(--a);font-family:var(--mono);-webkit-font-smoothing:antialiased}
+body{background:#06040200;color:var(--a);font-family:var(--mono);-webkit-font-smoothing:antialiased}
 
 /* ── ФОН ── */
 #bg-layer{position:fixed;inset:0;z-index:0}
-.bg-slide{position:absolute;inset:0;background-size:100% 100%;background-position:center;opacity:0;transition:opacity 2.5s ease}
+.bg-slide{
+  position:absolute;inset:0;
+  background-size:100% 100%;
+  background-position:center;
+  opacity:0;
+  transition:opacity 2.5s ease;
+}
 .bg-slide.active{opacity:1}
-#bg-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,4,2,0.28) 0%,rgba(6,4,2,0.0) 30%,rgba(6,4,2,0.32) 100%)}
+/* лёгкий оверлей только сверху и снизу для читаемости текста */
+#bg-overlay{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(to bottom, rgba(4,2,1,0.55) 0%, transparent 18%),
+    linear-gradient(to top,    rgba(4,2,1,0.45) 0%, transparent 12%);
+}
 
 #app{position:fixed;inset:0;z-index:10;pointer-events:none}
 
-/* ── ЧАСЫ ── */
-#clock{position:absolute;top:22px;left:26px;font-family:var(--mono);line-height:1.3}
-#clock-time{font-size:62px;color:var(--a);text-shadow:var(--glow);letter-spacing:2px;line-height:1}
-#clock-date{font-size:28px;letter-spacing:3px;color:rgba(255,140,0,0.5);margin-top:4px}
-
-/* ── СТАНЦИЯ ── */
-#station-id{position:absolute;top:22px;right:26px;text-align:right}
-#station-name{font-family:var(--title);font-size:34px;font-weight:700;letter-spacing:5px;color:var(--a);text-shadow:var(--glow)}
-#station-freq{font-size:26px;letter-spacing:3px;color:rgba(255,140,0,0.45);margin-top:6px}
+/* ══════════════════════════════════════════════
+   ВЕРХНЯЯ ПОЛОСА — часы слева, станция справа
+   тонкая, не перегружает
+══════════════════════════════════════════════ */
+#topbar{
+  position:absolute;top:0;left:0;right:0;
+  padding:16px 24px 12px;
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+}
+#clock-block{display:flex;flex-direction:column;gap:2px}
+#clock-time{
+  font-family:var(--mono);
+  font-size:42px;
+  color:var(--a);
+  text-shadow:var(--glow);
+  letter-spacing:2px;
+  line-height:1;
+}
+#clock-date{
+  font-family:var(--mono);
+  font-size:16px;
+  letter-spacing:3px;
+  color:rgba(255,140,0,0.48);
+}
+#station-block{text-align:right;display:flex;flex-direction:column;gap:2px}
+#station-name{
+  font-family:var(--title);
+  font-size:26px;
+  font-weight:700;
+  letter-spacing:4px;
+  color:var(--a);
+  text-shadow:var(--glow);
+}
+#station-freq{
+  font-family:var(--mono);
+  font-size:16px;
+  letter-spacing:3px;
+  color:rgba(255,140,0,0.45);
+}
 
 /* ══════════════════════════════════════════════
-   ПЛЕЕР — вписан в экран монитора на гифке
-   CRT-эффект: перспектива + scanlines + vignette
+   ПЛЕЕР — точно на экран монитора
+   CRT: perspective + лёгкий rotateY (монитор
+   стоит почти прямо, чуть под углом)
 ══════════════════════════════════════════════ */
 #player{
   position:absolute;
-  left:var(--screen-left);
-  top:var(--screen-top);
-  width:var(--screen-width);
-  height:var(--screen-height);
-  /* CRT наклон монитора */
-  transform: perspective(900px) rotateY(-3deg) rotateX(1.5deg) scale(0.98);
-  transform-origin: center center;
+  left:var(--sl);
+  top:var(--st);
+  width:var(--sw);
+  height:var(--sh);
   pointer-events:all;
   display:flex;
   flex-direction:column;
   overflow:hidden;
+  /* CRT перспектива */
+  transform: perspective(1200px) rotateY(-2deg) rotateX(0.8deg);
+  transform-origin: 50% 50%;
 }
 
-/* Обложка */
+/* Обложка трека — верхние ~65% плеера */
 #cover-wrap{
-  flex:1;
   position:relative;
+  flex:1;
   overflow:hidden;
   min-height:0;
 }
@@ -82,93 +130,155 @@ body{background:#060402;color:var(--a);font-family:var(--mono);-webkit-font-smoo
   object-fit:cover;
   opacity:0;
   transition:opacity 0.8s ease;
-  filter:brightness(0.78) saturate(0.65) contrast(1.1);
+  filter:brightness(0.75) saturate(0.6) contrast(1.12);
 }
 #cover-img.loaded{opacity:1}
 #cover-placeholder{
   position:absolute;inset:0;
+  background:#050302;
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--title);font-size:9px;letter-spacing:4px;
-  color:rgba(255,140,0,0.06);
-  background:#060301;
+  font-family:var(--title);font-size:8px;letter-spacing:5px;
+  color:rgba(255,140,0,0.05);
 }
-/* scanlines */
+/* CRT scanlines поверх обложки */
 #cover-wrap::after{
   content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,0,0,0.18) 2px,rgba(0,0,0,0.18) 3px);
+  background:repeating-linear-gradient(
+    0deg,transparent 0,transparent 2px,
+    rgba(0,0,0,0.2) 2px,rgba(0,0,0,0.2) 3px
+  );
 }
 /* CRT vignette */
 #cover-wrap::before{
   content:'';position:absolute;inset:0;z-index:3;pointer-events:none;
-  background:radial-gradient(ellipse at 50% 50%,transparent 40%,rgba(0,0,0,0.72) 100%);
+  background:radial-gradient(ellipse at 50% 45%,
+    transparent 38%,rgba(0,0,0,0.78) 100%
+  );
 }
 
-/* Нижняя панель */
+/* ── НИЖНЯЯ ПАНЕЛЬ (по скетчу) ──
+   Левая часть: мини-обложка + название + слайдер
+   Правая часть: квадратная кнопка Play
+*/
 #player-bar{
-  background:rgba(3,2,1,0.92);
-  padding:7px 10px 9px;
+  background:rgba(3,2,1,0.94);
+  border-top:1px solid rgba(255,140,0,0.18);
   flex-shrink:0;
-  border-top:1px solid rgba(255,140,0,0.15);
-  display:grid;
-  grid-template-rows:auto auto;
-  gap:6px;
+  display:flex;
+  align-items:stretch;
+  gap:0;
+  height:72px;
 }
-
-/* Строка статус + название */
-#info-row{display:flex;align-items:center;gap:6px;overflow:hidden}
+/* Левая часть панели */
+#bar-left{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:6px 10px 6px 10px;
+  gap:4px;
+  overflow:hidden;
+  min-width:0;
+}
+/* Статус */
+#status-row{display:flex;align-items:center;gap:5px}
 .s-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;transition:all 0.4s}
-.s-dot.off{background:rgba(255,140,0,0.18)}
+.s-dot.off{background:rgba(255,140,0,0.15)}
 .s-dot.on{background:var(--a);box-shadow:0 0 5px var(--a);animation:dp 2s ease-in-out infinite}
 @keyframes dp{0%,100%{opacity:1}50%{opacity:0.2}}
-#status-text{font-size:8px;letter-spacing:2px;color:rgba(255,140,0,0.3);text-transform:uppercase;flex-shrink:0}
-#track-title{font-size:11px;color:rgba(255,140,0,0.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity 0.35s;margin-left:4px}
+#status-text{font-size:7px;letter-spacing:2px;color:rgba(255,140,0,0.28);text-transform:uppercase}
+/* Название с прокруткой */
+#track-wrap{overflow:hidden;white-space:nowrap}
+#track-title{
+  display:inline-block;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.5px;
+  color:rgba(255,140,0,0.9);
+  white-space:nowrap;
+  transition:opacity 0.35s;
+}
+#track-title.scroll{animation:marquee 12s linear infinite}
+@keyframes marquee{
+  0%  {transform:translateX(0)}
+  30% {transform:translateX(0)}
+  70% {transform:translateX(-50%)}
+  100%{transform:translateX(-50%)}
+}
+/* Громкость */
+#vol-row{display:flex;align-items:center;gap:6px}
+.vol-lbl{font-size:7px;letter-spacing:1px;color:rgba(255,140,0,0.22);flex-shrink:0}
+#vol-slider{
+  flex:1;-webkit-appearance:none;
+  height:2px;background:rgba(255,140,0,0.2);
+  border-radius:1px;outline:none;cursor:pointer;
+}
+#vol-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:10px;height:10px;border-radius:50%;
+  background:var(--a);cursor:pointer;
+}
+#vol-slider::-moz-range-thumb{
+  width:10px;height:10px;border-radius:50%;border:none;
+  background:var(--a);cursor:pointer;
+}
+#vol-val{font-size:7px;color:rgba(255,140,0,0.22);width:18px;flex-shrink:0}
 
-/* Строка управления */
-#ctrl-row{display:flex;align-items:center;gap:10px}
+/* Правая часть — квадратная кнопка Play */
 #play-btn{
-  width:44px;height:44px;border-radius:50%;flex-shrink:0;
-  border:1px solid rgba(255,140,0,0.4);
-  background:rgba(255,140,0,0.1);
-  color:var(--a);cursor:pointer;
+  width:72px;
+  height:72px;
+  flex-shrink:0;
+  border:none;
+  border-left:1px solid rgba(255,140,0,0.18);
+  background:rgba(255,140,0,0.07);
+  color:var(--a);
+  cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:all 0.18s;
   -webkit-tap-highlight-color:transparent;
+  border-radius:0;
 }
-#play-btn:hover{background:rgba(255,140,0,0.22);border-color:var(--a);transform:scale(1.08)}
-#play-btn:active{transform:scale(0.92)}
-#vol-wrap{display:flex;align-items:center;gap:6px}
-.vol-lbl{font-size:8px;letter-spacing:1px;color:rgba(255,140,0,0.22);flex-shrink:0}
-#vol-slider{width:58px;flex:none;-webkit-appearance:none;height:1px;background:rgba(255,140,0,0.2);border-radius:1px;outline:none;cursor:pointer}
-#vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:var(--a);cursor:pointer}
-#vol-slider::-moz-range-thumb{width:10px;height:10px;border-radius:50%;border:none;background:var(--a);cursor:pointer}
-#vol-val{font-size:8px;color:rgba(255,140,0,0.2);width:18px}
+#play-btn:hover{background:rgba(255,140,0,0.16);color:rgba(255,140,0,1)}
+#play-btn:active{transform:scale(0.94)}
 
-/* ── ТЕКСТ СНИЗУ СЛЕВА ── */
+/* ── НИЖНИЙ ТЕКСТ ── */
 #footer-l{
-  position:absolute;bottom:18px;left:26px;
-  font-size:14px;letter-spacing:2px;
-  color:rgba(255,140,0,0.65);
+  position:absolute;bottom:14px;left:24px;
+  font-family:var(--mono);
+  font-size:11px;letter-spacing:2.5px;
+  color:rgba(255,140,0,0.5);
   text-transform:uppercase;
   font-style:italic;
 }
 
-/* ── QR — поверх водяного знака Kling ── */
+/* ── QR — точно поверх Kling watermark ──
+   В GIF watermark ~x=355/480=74%, y=248/270=91.9%
+   Позиция: bottom и right от края viewport
+*/
 #qr-img{
   position:absolute;
-  bottom:6px;
-  right:6px;
-  width:90px;height:90px;
-  /* Красим синий QR в оранжевый */
-  filter: invert(1) sepia(1) saturate(4) hue-rotate(355deg) brightness(0.9) opacity(0.85);
+  bottom:0;
+  right:0;
+  width:88px;
+  height:88px;
+  filter: invert(1) sepia(1) saturate(5) hue-rotate(352deg) brightness(0.85) opacity(0.9);
   pointer-events:none;
+  display:block;
 }
 
 /* ── МОБИЛЬНЫЙ ── */
-@media(max-width:768px){
-  #player{left:8%;top:auto;bottom:70px;width:84%;height:auto;transform:none}
-  #cover-wrap{height:180px;flex:none}
-  #clock-time{font-size:36px}#clock-date{font-size:18px}
-  #station-name{font-size:20px}#station-freq{font-size:14px}
+@media(max-width:600px){
+  #player{
+    left:5%;top:auto;
+    bottom:60px;
+    width:90%;height:auto;
+    transform:none;
+  }
+  #cover-wrap{height:160px;flex:none}
+  #clock-time{font-size:28px}
+  #clock-date{font-size:12px}
+  #station-name{font-size:16px}
+  #station-freq{font-size:12px}
   #qr-img,#footer-l{display:none}
 }
 
@@ -180,45 +290,51 @@ body{background:#060402;color:var(--a);font-family:var(--mono);-webkit-font-smoo
 <div id="bg-layer"><div id="bg-overlay"></div></div>
 
 <div id="app">
-  <div id="clock">
-    <div id="clock-time">00:00:00</div>
-    <div id="clock-date">00.00.0000</div>
+
+  <!-- Верхняя полоса -->
+  <div id="topbar">
+    <div id="clock-block">
+      <div id="clock-time">00:00:00</div>
+      <div id="clock-date">00.00.0000</div>
+    </div>
+    <div id="station-block">
+      <div id="station-name">БУНКЕР 42</div>
+      <div id="station-freq">105.3 FM</div>
+    </div>
   </div>
 
-  <div id="station-id">
-    <div id="station-name">БУНКЕР 42</div>
-    <div id="station-freq">105.3 FM</div>
-  </div>
-
+  <!-- Плеер на экране монитора -->
   <div id="player">
     <div id="cover-wrap">
       <div id="cover-placeholder">BUNKER 42</div>
       <img id="cover-img" src="" alt="">
     </div>
     <div id="player-bar">
-      <div id="info-row">
-        <div class="s-dot off" id="s-dot"></div>
-        <span id="status-text">ИНИЦИАЛИЗАЦИЯ</span>
-        <span id="track-title">—</span>
-      </div>
-      <div id="ctrl-row">
-        <button id="play-btn" aria-label="Play/Pause">
-          <svg id="icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-          <svg id="icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-        </button>
-        <div id="vol-wrap">
+      <div id="bar-left">
+        <div id="status-row">
+          <div class="s-dot off" id="s-dot"></div>
+          <span id="status-text">ИНИЦИАЛИЗАЦИЯ</span>
+        </div>
+        <div id="track-wrap">
+          <span id="track-title">—</span>
+        </div>
+        <div id="vol-row">
           <span class="vol-lbl">VOL</span>
           <input type="range" id="vol-slider" min="0" max="100" value="70" step="1">
           <span id="vol-val">70</span>
         </div>
       </div>
+      <button id="play-btn" aria-label="Play/Pause">
+        <svg id="icon-play" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="icon-pause" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
     </div>
   </div>
 
   <div id="footer-l">Лучшая музыка для уцелевших</div>
 
-  <!-- QR поверх водяного знака Kling -->
-  <img id="qr-img" src="qr.png" alt="Telegram">
+  <img id="qr-img" src="qr.png" alt="">
+
 </div>
 
 <div id="yt-container"><div id="yt-iframe"></div></div>
@@ -272,18 +388,17 @@ function buildQueue(){queue=CONFIG.player.shuffle?deterministicShuffle(allTracks
 function parseDuration(iso){
   if(!iso)return 240;
   const m=iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-  if(!m)return 240;
-  return(parseInt(m[1]||0)*3600)+(parseInt(m[2]||0)*60)+parseInt(m[3]||0);
+  return(parseInt(m&&m[1]||0)*3600)+(parseInt(m&&m[2]||0)*60)+parseInt(m&&m[3]||0);
 }
 
-async function fetchDurations(videoIds){
+async function fetchDurations(ids){
   const{apiKey}=CONFIG.youtube,d={};
-  for(let i=0;i<videoIds.length;i+=50){
-    const batch=videoIds.slice(i,i+50).join(',');
+  for(let i=0;i<ids.length;i+=50){
+    const batch=ids.slice(i,i+50).join(',');
     try{
       const res=await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${batch}&key=${apiKey}`);
       const data=await res.json();
-      (data.items||[]).forEach(item=>{d[item.id]=parseDuration(item.contentDetails?.duration);});
+      (data.items||[]).forEach(it=>{d[it.id]=parseDuration(it.contentDetails?.duration);});
     }catch(e){}
   }
   return d;
@@ -291,10 +406,9 @@ async function fetchDurations(videoIds){
 
 function getCurrentPosition(){
   const now=Math.floor(Date.now()/1000),elapsed=now-RADIO_EPOCH;
-  const totalDur=allTracks.reduce((s,t)=>s+t.duration,0);
-  if(!totalDur)return{trackIdx:0,seekTo:0};
-  const pos=elapsed%totalDur;
-  let acc=0;
+  const total=allTracks.reduce((s,t)=>s+t.duration,0);
+  if(!total)return{trackIdx:0,seekTo:0};
+  const pos=elapsed%total;let acc=0;
   for(let i=0;i<queue.length;i++){
     const dur=allTracks[queue[i]].duration;
     if(pos<acc+dur)return{trackIdx:i,seekTo:pos-acc};
@@ -303,15 +417,15 @@ function getCurrentPosition(){
   return{trackIdx:0,seekTo:0};
 }
 
-async function fetchPlaylist(pageToken){
+async function fetchPlaylist(pt){
   const{apiKey,playlistId}=CONFIG.youtube;
   if(!apiKey||apiKey.includes('ВСТАВЬ')){setStatus('УКАЖИ API КЛЮЧ');return[];}
   if(!playlistId||playlistId.includes('ВСТАВЬ')){setStatus('УКАЖИ ID ПЛЕЙЛИСТА');return[];}
   let url=`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=${apiKey}`;
-  if(pageToken)url+=`&pageToken=${pageToken}`;
+  if(pt)url+=`&pageToken=${pt}`;
   let data;
-  try{const res=await fetch(url);data=await res.json();}catch(e){setStatus('ОШИБКА СЕТИ');return[];}
-  if(data.error){setStatus(data.error.message.slice(0,40).toUpperCase());return[];}
+  try{const r=await fetch(url);data=await r.json();}catch(e){setStatus('ОШИБКА СЕТИ');return[];}
+  if(data.error){setStatus(data.error.message.slice(0,38).toUpperCase());return[];}
   const items=(data.items||[]).filter(it=>it.snippet.title!=='Private video'&&it.snippet.title!=='Deleted video')
     .map(it=>({
       id:it.snippet.resourceId.videoId,title:it.snippet.title,
@@ -326,14 +440,25 @@ async function fetchPlaylist(pageToken){
 function loadTrackUI(track){
   const te=document.getElementById('track-title');
   te.style.opacity=0;
-  setTimeout(()=>{te.textContent=track.title;te.style.transition='opacity 0.5s';te.style.opacity=1;},350);
+  te.classList.remove('scroll');
+  setTimeout(()=>{
+    te.textContent=track.title;
+    te.style.transition='opacity 0.5s';
+    te.style.opacity=1;
+    // Дублируем текст для бесшовной прокрутки если длинный
+    const wrap=document.getElementById('track-wrap');
+    if(te.scrollWidth>wrap.clientWidth){
+      te.textContent=track.title+'   •   '+track.title;
+      te.classList.add('scroll');
+    }
+  },350);
   const img=document.getElementById('cover-img');
   img.classList.remove('loaded');
   img.onload=()=>img.classList.add('loaded');
   img.onerror=()=>{img.src=`https://img.youtube.com/vi/${track.id}/hqdefault.jpg`;};
   img.src=track.thumb;
 }
-function setStatus(text){document.getElementById('status-text').textContent=text;}
+function setStatus(t){document.getElementById('status-text').textContent=t;}
 
 function playTrack(idx,seek){
   if(!ytPlayer||!allTracks.length)return;
@@ -375,9 +500,9 @@ function applyVolume(){
   if(ytPlayer&&typeof ytPlayer.setVolume==='function')ytPlayer.setVolume(isVoice?0:vol);
   if(voiceAudio)voiceAudio.volume=vol/100;
 }
-function setPlayIcon(s){
-  document.getElementById('icon-play').style.display=s?'block':'none';
-  document.getElementById('icon-pause').style.display=s?'none':'block';
+function setPlayIcon(show){
+  document.getElementById('icon-play').style.display=show?'block':'none';
+  document.getElementById('icon-pause').style.display=show?'none':'block';
 }
 
 function togglePlay(){
@@ -401,9 +526,7 @@ function togglePlay(){
 }
 
 function loadYouTubeAPI(){
-  const s=document.createElement('script');
-  s.src='https://www.youtube.com/iframe_api';
-  document.head.appendChild(s);
+  const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);
 }
 window.onYouTubeIframeAPIReady=function(){ytAPIReady=true;tryInitPlayer();};
 function tryInitPlayer(){
