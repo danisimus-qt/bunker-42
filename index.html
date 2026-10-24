@@ -1,32 +1,23 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>БУНКЕР 42</title>
+<title>ПЕЛЕНГ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tektur:wght@400;500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
 
-/*
-  ПОЗИЦИЯ ПЛЕЕРА — вычислена по гифке
-  Рамка A (красная) попала точно:
-  left=44%, top=17%, width=30%, height=55%
-  Немного расширяем:
-*/
 :root{
-  --sl: 38.5%;
-  --st: 29.5%;
-  --sw: 24%;
-  --sh: 31%;
-  --a:#FF8C00;
-  --a40:rgba(255,140,0,0.4);
-  --glow:0 0 14px rgba(255,140,0,0.75),0 0 36px rgba(255,140,0,0.2);
-  --mono:'Share Tech Mono',monospace;
-  --title:'Orbitron',sans-serif;
+  --a:#EBC699;
+  --glow:0 0 14px rgba(235,198,153,0.35),0 0 36px rgba(235,198,153,0.12);
+  --pbg:#1B1302;
+  --pfg:#EBC699;
+  --title:'Tektur',sans-serif;
+  --pix:'Press Start 2P',monospace;
+  --mono:'Tektur',sans-serif;
 }
 
 body{background:#060402;color:var(--a);font-family:var(--mono);-webkit-font-smoothing:antialiased}
@@ -35,6 +26,7 @@ body{background:#060402;color:var(--a);font-family:var(--mono);-webkit-font-smoo
 #bg-layer{position:fixed;inset:0;z-index:0}
 .bg-slide{position:absolute;inset:0;background-size:100% 100%;background-position:center;opacity:0;transition:opacity 2.5s ease}
 .bg-slide.active{opacity:1}
+video.bg-slide{width:100%;height:100%;object-fit:cover;background:#060402}
 #bg-overlay{
   position:absolute;inset:0;
   background:linear-gradient(to bottom,rgba(4,2,1,0.5) 0%,transparent 20%),
@@ -49,155 +41,91 @@ body{background:#060402;color:var(--a);font-family:var(--mono);-webkit-font-smoo
   padding:16px 24px 0;
   display:flex;align-items:flex-start;justify-content:space-between;
 }
-#clock-block{display:flex;flex-direction:column;gap:2px}
-#clock-time{font-family:var(--mono);font-size:42px;color:var(--a);text-shadow:var(--glow);letter-spacing:2px;line-height:1}
-#clock-date{font-family:var(--mono);font-size:16px;letter-spacing:3px;color:rgba(255,140,0,0.48)}
+#clock-block{display:flex;flex-direction:column;gap:8px}
+#clock-time{font-family:var(--title);font-weight:500;font-size:42px;color:var(--a);text-shadow:var(--glow);letter-spacing:2px;line-height:1}
+#clock-date{font-family:var(--pix);font-size:11px;letter-spacing:1px;color:rgba(235,198,153,0.6)}
 #station-block{text-align:right}
-#station-name{font-family:var(--title);font-size:26px;font-weight:700;letter-spacing:4px;color:var(--a);text-shadow:var(--glow)}
-#station-freq{font-family:var(--mono);font-size:16px;letter-spacing:3px;color:rgba(255,140,0,0.45);margin-top:4px}
+#station-name{font-family:var(--title);font-size:26px;font-weight:700;letter-spacing:3px;color:var(--a);text-shadow:var(--glow);text-transform:uppercase}
+#station-freq{font-family:var(--pix);font-size:11px;letter-spacing:1px;color:rgba(235,198,153,0.6);margin-top:8px}
 
-/* ══════════════════════════════════════════
-   ПЛЕЕР НА ЭКРАНЕ МОНИТОРА
-   Лёгкое CRT-преломление
-══════════════════════════════════════════ */
+/* ══ ФЛОАТИНГ-ПЛЕЕР ══ */
 #player{
-  position:absolute;
-  left:var(--sl);top:var(--st);
-  width:var(--sw);height:var(--sh);
+  position:absolute;right:48px;top:50%;transform:translateY(-50%);
+  width:340px;
+  background:var(--pbg);color:var(--pfg);
+  border:1px solid rgba(235,198,153,0.28);
+  padding:14px 16px 12px;
+  display:flex;flex-direction:column;gap:12px;
   pointer-events:all;
-  display:flex;flex-direction:column;
-  overflow:hidden;
-  border-radius: 8px 8px 4px 4px;
-  
+  box-shadow:0 14px 44px rgba(0,0,0,0.6);
 }
-
-/* ОБЛОЖКА с рамкой */
+#p-top{display:flex;align-items:center;gap:14px}
 #cover-wrap{
-  flex:1;position:relative;overflow:hidden;min-height:0;
-  /* Рамка вокруг обложки */
-  border:2px solid rgba(255,140,0,0.55);
-  box-shadow:
-    inset 0 0 20px rgba(0,0,0,0.6),
-    0 0 0 1px rgba(255,140,0,0.2);
+  width:72px;height:72px;flex:none;position:relative;overflow:hidden;
+  background:#0d0a01;border:1px solid rgba(235,198,153,0.3);
 }
 #cover-img{
   position:absolute;inset:0;width:100%;height:100%;
   object-fit:cover;opacity:0;transition:opacity 0.8s ease;
-  filter:brightness(0.78) saturate(0.65) contrast(1.1);
 }
 #cover-img.loaded{opacity:1}
-#cover-placeholder{
-  position:absolute;inset:0;background:#050302;
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--title);font-size:9px;letter-spacing:5px;color:rgba(255,140,0,0.06);
-}
-/* CRT scanlines */
-#cover-wrap::after{
-  content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,0,0,0.18) 2px,rgba(0,0,0,0.18) 3px);
-}
-/* CRT vignette */
-#cover-wrap::before{
-  content:'';position:absolute;inset:0;z-index:3;pointer-events:none;
-  background:radial-gradient(ellipse at 50% 45%,transparent 35%,rgba(0,0,0,0.75) 100%);
-}
-
-/* ══ НИЖНЯЯ ПАНЕЛЬ — по скетчу ══
-   [статус + название + слайдер] [PLAY]
-*/
-#player-bar{
-  background:rgba(3,2,1,0.95);
-  border-top:2px solid rgba(255,140,0,0.4);
-  flex-shrink:0;
-  display:flex;
-  align-items:stretch;
-  height:64px;
-}
-
-/* Левая зона */
-#bar-left{
-  flex:1;min-width:0;
-  display:flex;flex-direction:column;
-  justify-content:center;
-  align-items:flex-start;
-  padding:8px 10px 8px 12px;
-  gap:5px;
-}
-
-/* Статус-строка */
-#status-row{display:flex;align-items:center;gap:6px}
-.s-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;transition:all 0.4s}
-.s-dot.off{background:rgba(255,140,0,0.2)}
-.s-dot.on{background:var(--a);box-shadow:0 0 6px var(--a);animation:dp 2s ease-in-out infinite}
-@keyframes dp{0%,100%{opacity:1}50%{opacity:0.2}}
-#status-text{font-size:10px;letter-spacing:2.5px;color:rgba(255,140,0,0.7);text-transform:uppercase}
-
-/* Название — по центру, прокрутка если длинное */
-#track-wrap{overflow:hidden;white-space:nowrap;width:100%}
-#track-title{
-  display:inline-block;
-  font-family:var(--mono);
-  font-size:13px;
-  letter-spacing:0.5px;
-  color:rgba(255,140,0,0.95);
-  white-space:nowrap;
+#meta{min-width:0;flex:1;display:flex;flex-direction:column;gap:6px}
+#track-artist,#track-name{
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   transition:opacity 0.35s;
 }
-#track-title.scroll{animation:marquee 14s linear infinite}
-@keyframes marquee{
-  0%,25%{transform:translateX(0)}
-  75%,100%{transform:translateX(calc(-50% - 20px))}
-}
+#track-artist{font-family:var(--title);font-weight:500;font-size:13px;color:rgba(235,198,153,0.65)}
+#track-name{font-family:var(--title);font-weight:700;font-size:18px;line-height:1.2;color:var(--pfg)}
 
-/* Громкость */
-#vol-row{display:flex;align-items:center;gap:7px}
-.vol-lbl{font-size:9px;letter-spacing:1px;color:rgba(255,140,0,0.35);flex-shrink:0}
-#vol-slider{
-  width:80px;flex:none;
-  -webkit-appearance:none;height:2px;
-  background:rgba(255,140,0,0.2);border-radius:1px;outline:none;cursor:pointer;
-}
-#vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--a);cursor:pointer}
-#vol-slider::-moz-range-thumb{width:11px;height:11px;border-radius:50%;border:none;background:var(--a);cursor:pointer}
-#vol-val{font-size:9px;color:rgba(255,140,0,0.35);width:20px;flex-shrink:0}
-
-/* КНОПКА PLAY — квадратная, правая зона */
+#p-ctrl{display:flex;align-items:center;gap:14px}
 #play-btn{
-  width:76px;height:64px;flex-shrink:0;
-  border:none;border-left:2px solid rgba(255,140,0,0.4);
-  background:rgba(255,140,0,0.06);
-  color:var(--a);cursor:pointer;
+  width:38px;height:38px;flex:none;
+  border:1px solid var(--pfg);background:transparent;color:var(--pfg);cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  transition:all 0.18s;
+  transition:background 0.18s,color 0.18s;
   -webkit-tap-highlight-color:transparent;
 }
-#play-btn:hover{background:rgba(255,140,0,0.15)}
-#play-btn:active{transform:scale(0.93)}
+#play-btn:hover{background:var(--pfg);color:var(--pbg)}
+#play-btn:active{transform:scale(0.94)}
 #play-btn svg{display:block}
+#vol-row{flex:1;min-width:0;display:flex;align-items:center;gap:9px;color:rgba(235,198,153,0.7)}
+#vol-row svg{flex:none;display:block}
+#vol-slider{
+  flex:1;min-width:0;
+  -webkit-appearance:none;appearance:none;height:3px;
+  background:rgba(235,198,153,0.25);outline:none;cursor:pointer;
+}
+#vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:var(--pfg);border:none;cursor:pointer}
+#vol-slider::-moz-range-thumb{width:12px;height:12px;border-radius:0;border:none;background:var(--pfg);cursor:pointer}
+
+#p-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding-top:10px;border-top:1px solid rgba(235,198,153,0.18);
+  font-family:var(--pix);font-size:8px;line-height:1.4;
+}
+#status-row{display:flex;align-items:center;gap:7px;min-width:0}
+#status-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
+.s-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:all 0.4s}
+.s-dot.off{background:rgba(235,198,153,0.25)}
+.s-dot.on{background:var(--pfg);box-shadow:0 0 6px var(--pfg);animation:dp 2s ease-in-out infinite}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:0.25}}
+#player-freq{flex:none;color:rgba(235,198,153,0.7)}
 
 /* ── НИЖНИЙ ТЕКСТ ── */
 #footer-l{
-  position:absolute;bottom:14px;left:24px;
-  font-family:var(--mono);font-size:11px;letter-spacing:2.5px;
-  color:rgba(255,140,0,0.5);text-transform:uppercase;font-style:italic;
-}
-
-/* ── QR поверх Kling ── */
-#qr-img{
-  position:absolute;bottom:0;right:0;
-  width:90px;height:90px;
-  filter:invert(1) sepia(1) saturate(5) hue-rotate(352deg) brightness(0.85) opacity(0.88);
-  pointer-events:none;
-  display:block;
+  position:absolute;bottom:16px;left:24px;
+  font-family:var(--pix);font-size:9px;letter-spacing:1px;
+  color:rgba(235,198,153,0.55);
 }
 
 /* ── МОБИЛЬНЫЙ ── */
 @media(max-width:600px){
-  #player{left:5%;top:auto;bottom:60px;width:90%;height:auto;transform:none}
-  #cover-wrap{height:200px;flex:none}
-  #clock-time{font-size:28px}#clock-date{font-size:13px}
-  #station-name{font-size:18px}#station-freq{font-size:13px}
-  #qr-img,#footer-l{display:none}
+  #player{right:auto;left:50%;top:auto;bottom:20px;transform:translateX(-50%);width:calc(100% - 32px)}
+  #vol-row{display:none}
+  #play-btn{width:100%;height:44px}
+  #clock-time{font-size:28px}#clock-date{font-size:9px}
+  #station-name{font-size:18px}#station-freq{font-size:9px}
+  #footer-l{display:none}
 }
 
 #yt-container{position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;overflow:hidden;pointer-events:none}
@@ -213,40 +141,37 @@ body{background:#060402;color:var(--a);font-family:var(--mono);-webkit-font-smoo
       <div id="clock-date">00.00.0000</div>
     </div>
     <div id="station-block">
-      <div id="station-name">БУНКЕР 42</div>
+      <div id="station-name">ПЕЛЕНГ</div>
       <div id="station-freq">105.3 FM</div>
     </div>
   </div>
 
   <div id="player">
-    <div id="cover-wrap">
-      <div id="cover-placeholder">BUNKER 42</div>
-      <img id="cover-img" src="" alt="">
-    </div>
-    <div id="player-bar">
-      <div id="bar-left">
-        <div id="status-row">
-          <div class="s-dot off" id="s-dot"></div>
-          <span id="status-text">ИНИЦИАЛИЗАЦИЯ</span>
-        </div>
-        <div id="track-wrap">
-          <span id="track-title">—</span>
-        </div>
-        <div id="vol-row">
-          <span class="vol-lbl">VOL</span>
-          <input type="range" id="vol-slider" min="0" max="100" value="70" step="1">
-          <span id="vol-val">70</span>
-        </div>
+    <div id="p-top">
+      <div id="cover-wrap"><img id="cover-img" src="" alt=""></div>
+      <div id="meta">
+        <div id="track-artist"></div>
+        <div id="track-name">Настройка частоты</div>
       </div>
+    </div>
+    <div id="p-ctrl">
       <button id="play-btn" aria-label="Play/Pause">
-        <svg id="icon-play" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        <svg id="icon-pause" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        <svg id="icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
       </button>
+      <div id="vol-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 4V5L7 9H3z"/></svg>
+        <input type="range" id="vol-slider" min="0" max="100" value="70" step="1" aria-label="Громкость">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4.03v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06a9 9 0 0 0 0-17.54z"/></svg>
+      </div>
+    </div>
+    <div id="p-foot">
+      <div id="status-row"><div class="s-dot off" id="s-dot"></div><span id="status-text">Инициализация</span></div>
+      <span id="player-freq">105.3 FM</span>
     </div>
   </div>
 
   <div id="footer-l">Лучшая музыка для уцелевших</div>
-  <img id="qr-img" src="qr.png" alt="">
 </div>
 
 <div id="yt-container"><div id="yt-iframe"></div></div>
@@ -268,17 +193,26 @@ setInterval(updateClock,1000);updateClock();
 
 document.getElementById('station-name').textContent=CONFIG.station.name;
 document.getElementById('station-freq').textContent=CONFIG.station.frequency;
+document.getElementById('player-freq').textContent=CONFIG.station.frequency;
 document.title=CONFIG.station.name;
 document.getElementById('vol-slider').value=CONFIG.player.defaultVolume;
-document.getElementById('vol-val').textContent=CONFIG.player.defaultVolume;
 currentVol=CONFIG.player.defaultVolume;
 
 function initBackgrounds(){
   const layer=document.getElementById('bg-layer'),overlay=document.getElementById('bg-overlay');
   CONFIG.backgrounds.sources.forEach((src,i)=>{
-    const el=document.createElement('div');
-    el.className='bg-slide'+(i===0?' active':'');
-    el.style.backgroundImage=`url(${src})`;
+    let el;
+    if(/\.(mp4|webm)(\?|$)/i.test(src)){
+      el=document.createElement('video');
+      el.className='bg-slide'+(i===0?' active':'');
+      el.src=src;el.muted=true;el.loop=true;el.autoplay=true;el.playsInline=true;
+      el.setAttribute('muted','');el.setAttribute('playsinline','');
+      el.addEventListener('canplay',()=>el.play().catch(()=>{}));
+    }else{
+      el=document.createElement('div');
+      el.className='bg-slide'+(i===0?' active':'');
+      el.style.backgroundImage=`url(${src})`;
+    }
     layer.insertBefore(el,overlay);bgSlides.push(el);
   });
   if(bgSlides.length>1)setInterval(()=>{
@@ -348,19 +282,20 @@ async function fetchPlaylist(pt){
   return items;
 }
 
+function splitTitle(raw){
+  const t=raw.replace(/\s*[\(\[][^\)\]]*(official|video|audio|lyric|clip|клип|remaster|mv|hd|4k)[^\)\]]*[\)\]]/ig,'').trim();
+  const m=t.split(/\s+[-–—]\s+/);
+  if(m.length>=2)return{artist:m[0].trim(),name:m.slice(1).join(' - ').trim()};
+  return{artist:'Неизвестный источник',name:t};
+}
 function loadTrackUI(track){
-  const te=document.getElementById('track-title');
-  const wrap=document.getElementById('track-wrap');
-  te.style.opacity=0;te.classList.remove('scroll');
+  const a=document.getElementById('track-artist'),n=document.getElementById('track-name');
+  const p=splitTitle(track.title);
+  a.style.opacity=0;n.style.opacity=0;
   setTimeout(()=>{
-    te.textContent=track.title;
-    te.style.transition='opacity 0.5s';te.style.opacity=1;
-    requestAnimationFrame(()=>{
-      if(te.scrollWidth>wrap.clientWidth+2){
-        te.textContent=track.title+'   —   '+track.title;
-        te.classList.add('scroll');
-      }
-    });
+    a.textContent=p.artist;n.textContent=p.name;
+    a.title=n.title=track.title;
+    a.style.opacity=1;n.style.opacity=1;
   },350);
   const img=document.getElementById('cover-img');
   img.classList.remove('loaded');
@@ -448,7 +383,6 @@ function onYTState(e){
 document.getElementById('play-btn').addEventListener('click',togglePlay);
 document.getElementById('vol-slider').addEventListener('input',function(){
   currentVol=parseInt(this.value);
-  document.getElementById('vol-val').textContent=currentVol;
   if(!isMuted)applyVolume();
 });
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target===document.body){e.preventDefault();togglePlay();}});
